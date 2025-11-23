@@ -1,8 +1,9 @@
-const express = require('express');
+import express, {Request, Response} from 'express';
+
 const app = express();
 const port = 3000;
 
-app.get('/api/execute', async (req, res) => {
+app.get('/api/execute', async (req: Request, res: Response) => {
   const {message, code } = req.query;
 
   if (code !== 'pionnerdevai') {
@@ -19,3 +20,7 @@ app.get('/api/execute', async (req, res) => {
     res.status(500).json({error: 'internal service error' });
   }
 });
+
+app.listen(port, () => {
+  console.log(`the server is running on port ${port}`);
+})
