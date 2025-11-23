@@ -16,6 +16,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
+    "dev": "ts-node ./restaurant_app_finder/src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
