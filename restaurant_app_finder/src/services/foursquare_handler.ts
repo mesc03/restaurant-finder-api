@@ -18,7 +18,7 @@ export async function searchRestaurants(params: FoursquareParameters): Promise<R
                 query: params.query,
                 near: params.near,
                 categories: '13000', 
-                limit: 10,
+                limit: 5,
                 ...(params.price && { price: params.price }),
                 ...(params.open_now && { open_now: true })
             }

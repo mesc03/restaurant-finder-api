@@ -62,5 +62,5 @@ app.get('/api/execute', async (req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`the server is running on port http://localhost:${port}`);
-  console.log(`test the endpoint at http://localhost:${port}/api/execute?message=Find%20sushi%20in%20Tokyo&code=pionnerdevai`); // message can be edited in the url so feel free to try //
+  console.log(`test the endpoint at http://localhost:${port}/api/execute?message=cheap%pizza%near%me&code=pionnerdevai`); // message can be edited in the url so feel free to try //
 })
