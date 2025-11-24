@@ -1,8 +1,16 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {RestaurantCommand} from "../types";
 
-const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+// made sure the model loads the.env first
+let model: any;
+
+function getModel() {
+  if (!model) {
+    const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  }
+  return model;
+}
 
 const systemprompt = `You are a restaurant search query parser. Your job is to convert natural language requests into structured JSON commands.
 
@@ -37,7 +45,8 @@ export async function parseWithGemini(message: string): Promise<RestaurantComman
     }
 
     try {
-        const result = await model.generateContent(`${systemprompt}User request: "${message}"JSON output:`);
+        const modelInstance = getModel();
+        const result = await modelInstance.generateContent(`${systemprompt}User request: "${message}"JSON output:`);
         const text = result.response.text();
         
         // remove markdown code blocks if any
