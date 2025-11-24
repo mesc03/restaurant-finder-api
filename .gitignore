@@ -27,7 +27,7 @@ share/python-wheels/
 MANIFEST
 
 # Node.js dependencies
-node_modules/
+node_modules
 
 # .env file for api keys
 .env
