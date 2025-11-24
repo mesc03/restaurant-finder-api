@@ -1,5 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { RestaurantCommand } from "../types";
+import {GoogleGenerativeAI} from "@google/generative-ai";
+import {RestaurantCommand} from "../types";
 
 const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' });
