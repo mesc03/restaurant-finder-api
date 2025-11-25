@@ -1,8 +1,8 @@
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import {parseWithGemini} from './services/gemini_handler';
-import { error } from 'console';
-import { parse } from 'path';
+import {searchRestaurants} from './services/foursquare_handler';
+
 
 dotenv.config();
 
@@ -12,55 +12,61 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// check if api is running
+// api check 
 app.get('/', (req: Request, res: Response) => {
-  res.send('restaurant app finder api is running');
-})
+  res.json({ status: 'restaurant app finder API is running' });
+});
 
 // main api
 app.get('/api/execute', async (req: Request, res: Response) => {
   try {
-    const {message, code } = req.query;
-  
-    if (code !== 'pionnerdevai') {
+    const { message, code } = req.query;
+
+    // Validate access code
+    if (code !== 'pioneerdevai') {
       return res.status(401).json({
-        error: 'unauthorized',
-        message: 'invalid code'
+        error: 'Unauthorized',
+        message: 'Invalid access code'
       });
     }
   
-  // validate msg params
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({ 
-      error: 'message parameter is required and must be a string',
-      message: 'please provide a valid message query parameter'
+    // validate message parameter
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Message parameter is required and must be a string'
       });
     }
 
-  console.log(`processing request: "${message}"`);
+    console.log(`Processing request: "${message}"`);
 
-  // parse llm
-  const command = await parseWithGemini(message);
-  console.log('parsed command:', JSON .stringify(command, null, 2));
+    // step 1: parse language using gemini model
+    const command = await parseWithGemini(message);
+    console.log('Gemini parsed command:', JSON.stringify(command, null, 2));
 
-  // return parsing command
-  return res.json({ 
-    query: message,
-    parsed_command: command,
-    message: 'successfully parsed message'
-   });  
+    // step 2: use foursqaure api to find restaurants
+    const restaurants = await searchRestaurants(command.parameters);
+    console.log(`Found ${restaurants.length} restaurants`);
+
+    // step 3: return results in json format
+    return res.json({
+      query: message,
+      parsed_command: command,
+      results: restaurants,
+      count: restaurants.length
+    });  
 
   } catch (error: any) {
-    console.error('error in /api/execute:', error.message);
+    console.error('Error in /api/execute:', error.message);
 
     return res.status(500).json({
-      error: 'internal server error',
-      message: error.message || 'an unexpected error occurred'
+      error: 'Internal Server Error',
+      message: error.message || 'An unexpected error occurred'
     });
   }
 });
 
 app.listen(port, () => {
-  console.log(`the server is running on port http://localhost:${port}`);
-  console.log(`test the endpoint at http://localhost:${port}/api/execute?message=cheap%pizza%near%me&code=pionnerdevai`); // message can be edited in the url so feel free to try //
-})
+  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Test endpoint: http://localhost:${port}/api/execute?message=Find%20sushi%20in%20Tokyo&code=pioneerdevai`);
+});
