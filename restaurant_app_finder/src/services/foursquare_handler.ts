@@ -29,19 +29,18 @@ export async function searchRestaurants(params: FoursquareParameters): Promise<R
         
         return (response.data.response.venues || []).map(formatRestaurant);
     } catch (error: any) {
-        const msg = error.response
+        const msg = error.response?.data
         ? `Foursquare API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`
         : `Failed to search restaurants: ${error.message}`;
-        console.error(msg);
         throw new Error(msg);
     }
 }
 
 function formatRestaurant(venue: any): Restaurant {
-    const location = venue.location;
-    const address = location ? 
-        [location.address, location.city, location.state, location.country].filter(Boolean).join(', ') : 
-        'Address not available';
+    const loc = venue.location;
+    const address = [loc?.address, loc?.city, loc?.state, loc?.country]
+    .filter(Boolean)
+    .join(', ') || 'Address not available';
     
     return {
         fsq_id: venue.id,
