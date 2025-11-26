@@ -1,30 +1,33 @@
 import axios from 'axios';
 import {FoursquareParameters, Restaurant} from '../types';
 
-const FOURSQUARE_API_URL = 'https://api.foursquare.com/v3/places/search';
+const FOURSQUARE_API_URL = 'https://api.foursquare.com/v2/venues/search';
+const API_VERSION = '20231010';
 
 export async function searchRestaurants(params: FoursquareParameters): Promise<Restaurant[]> {
-    if (!process.env.FOURSQUARE_API_KEY) {
-        throw new Error('FOURSQUARE_API_KEY is not in .env or api is not set');
+    if (!process.env.FOURSQUARE_CLIENT_ID || !process.env.FOURSQUARE_CLIENT_SECRET) {
+        throw new Error('FOURSQUARE_CLIENT_ID and FOURSQUARE_CLIENT_SECRET must be set in .env');
     }
 
     try {
         const response = await axios.get(FOURSQUARE_API_URL, {
-            headers: {
-                'Authorization': process.env.FOURSQUARE_API_KEY,
-                'Accept': 'application/json'
-            },
             params: {
+                client_id: process.env.FOURSQUARE_CLIENT_ID,
+                client_secret: process.env.FOURSQUARE_CLIENT_SECRET,
+                v: API_VERSION,
                 query: params.query,
                 near: params.near,
-                categories: '13000', 
+                categoryId: '4d4b7105d754a06374d81259',
                 limit: 5,
                 ...(params.price && { price: params.price }),
-                ...(params.open_now && { open_now: true })
+                ...(params.open_now && { openNow: 1 })
             }
         });
         
-        return (response.data.results || []).map(formatRestaurant);
+        // show raw Foursquare response
+        console.log('Raw Foursquare response:', JSON.stringify(response.data.response, null, 2));
+        
+        return (response.data.response.venues || []).map(formatRestaurant);
     } catch (error: any) {
         const msg = error.response
         ? `Foursquare API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`
@@ -34,12 +37,17 @@ export async function searchRestaurants(params: FoursquareParameters): Promise<R
     }
 }
 
-function formatRestaurant(place: any): Restaurant {
+function formatRestaurant(venue: any): Restaurant {
+    const location = venue.location;
+    const address = location ? 
+        [location.address, location.city, location.state, location.country].filter(Boolean).join(', ') : 
+        'Address not available';
+    
     return {
-        fsq_id: place.fsq_id,
-        name: place.name,
-        address: place.location?.formatted_address || 'Address not available',
-        cuisine: place.categories?.map((cat: any) => cat.name).join(', '),
-        rating: place.rating
+        fsq_id: venue.id,
+        name: venue.name,
+        address: address,
+        cuisine: venue.categories?.map((cat: any) => cat.name).join(', '),
+        rating: venue.rating
     };
 }

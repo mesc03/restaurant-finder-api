@@ -68,5 +68,5 @@ app.get('/api/execute', async (req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
-  console.log(`Test endpoint: http://localhost:${port}/api/execute?message=Find%20sushi%20in%20Tokyo&code=pioneerdevai`);
+  console.log(`Test endpoint: http://localhost:${port}/api/execute?message=Find%20cheap%20pizza%20in%20los%20angeles&code=pioneerdevai`);
 });
