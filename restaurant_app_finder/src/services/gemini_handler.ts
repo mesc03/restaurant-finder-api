@@ -1,7 +1,6 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {RestaurantCommand} from "../types";
 
-// made sure the model loads the.env first
 let model: any;
 
 function getModel() {
@@ -13,8 +12,6 @@ function getModel() {
 }
 
 const systemprompt = `You are a restaurant search query parser. Your job is to convert natural language requests into structured JSON commands.
-
-Convert user requests into JSON format (valid output would be json, no other):
 
 {
   "action": "restaurant_search",
@@ -28,12 +25,6 @@ Convert user requests into JSON format (valid output would be json, no other):
 
 RULES:
 1. Output ONLY valid JSON, no markdown, no explanations, no code blocks
-2. "query" should be the cuisine type (e.g., "sushi", "italian", "pizza")
-3. "near" should be the location (e.g., "downtown Los Angeles", "New York, NY")
-4. "price" would be 1=cheap, 2=moderate, 3=expensive, 4=very expensive
-5. "open_now" should be true if user mentions "open now" or "currently open"
-6. If user mentions rating (e.g., "4-star"), ignore it in JSON (we'll filter after API call)
-7. Only include optional fields if explicitly mentioned by user
 
 examples:
 - "find me a sushi place in tokyo" → {"action":"restaurant_search","parameters":{"query":"sushi","near":"Tokyo"}}
@@ -52,7 +43,6 @@ export async function parseWithGemini(message: string): Promise<RestaurantComman
         // remove markdown code blocks if any
         const cleanedText = text.replace(/```json|```/g, '').trim();
         
-        // json parser 
         const parsed: RestaurantCommand = JSON.parse(cleanedText);
         
         // validate structure
