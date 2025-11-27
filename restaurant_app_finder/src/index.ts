@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import {parseWithGemini} from './services/gemini_handler';
-import {searchRestaurants} from './services/foursquare_handler';
+import { parseWithGemini } from './services/gemini_handler';
+import { searchRestaurants } from './services/foursquare_handler';
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ app.get('/api/execute', async (req: Request, res: Response) => {
   try {
     const { message, code } = req.query;
 
-    // Validate access code
+    // validate access code
     if (code !== 'pioneerdevai') {
       return res.status(401).json({
         error: 'unauthorized',
