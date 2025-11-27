@@ -1,5 +1,5 @@
-import {GoogleGenerativeAI} from "@google/generative-ai";
-import {RestaurantCommand} from "../types";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { RestaurantCommand } from "../types";
 
 let model: any;
 

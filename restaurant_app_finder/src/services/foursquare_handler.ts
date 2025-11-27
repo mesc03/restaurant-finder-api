@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {FoursquareParameters, Restaurant} from '../types';
+import { FoursquareParameters, Restaurant } from '../types';
 
 const FOURSQUARE_API_URL = 'https://api.foursquare.com/v2/venues/search';
 const API_VERSION = '20231010';
